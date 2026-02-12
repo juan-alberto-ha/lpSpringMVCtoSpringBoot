@@ -35,7 +35,7 @@ sudo $CATALINA_HOME/bin/catalina.sh start
 
 ```
 
-To deploy the WAR file we can use curl (make sure to have user and password set in file tomcat-users.xml):
+To deploy the WAR file we can use curl. Make sure to have user and password set in file tomcat-users.xml. I have renamed the WAR file to webreport.war:
 ```
 curl --user robot:robot --upload-file target/webreport.war http://localhost:8080/manager/text/deploy?path=/webreport
 ```
