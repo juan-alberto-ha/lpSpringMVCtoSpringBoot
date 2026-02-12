@@ -42,7 +42,7 @@ curl --user robot:robot --upload-file target/webreport.war http://localhost:8080
 
 ### Determining the endpoint
 
-In class Matchcontroller we find the __/reports/season-report/<season>__ endpoint. <season> should have this format: yyyy-yyyy, for example '2019-2020'
+In class Matchcontroller.java we find the __/reports/season-report/<season>__ endpoint. <season> should have this format: yyyy-yyyy, for example '2019-2020'
 ```java
 @RequestMapping("/reports")
 public class MatchController 
