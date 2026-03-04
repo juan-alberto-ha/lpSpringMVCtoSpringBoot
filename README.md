@@ -53,3 +53,77 @@ public class MatchController
 @ResponseStatus(value = HttpStatus.OK)
 ```
 
+## Modernizing the Legacy Application with Spring Boot
+
+I have used __spring initialzr__ (https://start.spring.io/) to create the skeleton of the bootified application. 
+These are the settings I have used: 
+- Project: Maven
+- Language: Java
+- Spring Boot: 4.0.2
+- Project Metadata Group: liveproject
+- Project Metadata Artifact: webreport
+- Packaging: Jar
+- Configuration: Properties
+- Java: 17
+- Dependencies: Lombok, Spring Web, Thymeleaf, H2 Database, Spring Data JPA, Spring Boot Actuator
+
+I switch the Java alternative, in order to use Java 17:
+```
+sudo update-java-alternatives --set /usr/lib/jvm/java-1.19.0-openjdk-amd64
+
+```
+I checked that the dowloaded application from Spring Initializr can be packaged using Maven. JAR was created.
+
+To check that the downloaded application can run we execute:
+```
+mvn spring-boot:run
+```
+### Migration of Spring MVC code to Spring Boot skeleton
+The approach that I will follow is to migrate (basically copy) the code from the Spring MVC application to the Spring Boot.
+
+
+#### Files in resources directory
+I copied the files in the ``resources`` directory.
+Remove all files from the ``resources`` folder, except for ``application.properties`` and the data file ``epl2019-2020.json`` .
+In file ``application.properties`` we add the properties for the persistence layer:
+```
+spring.datasource.url=jdbc:h2:~/epl-test
+spring.datasource.driverClassName=org.h2.Driver
+spring.datasource.username=sa
+spring.datasource.password=
+spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+spring.h2.console.enabled=true
+spring.jpa.hibernate.ddl-auto=create
+```
+Additionally, in order to keep the ``webreport`` context path, I have added:
+```
+server.servlet.context-path=/webreport
+```
+I have copied directories ``fragments`` and ``reports`` to the ``resources/templates`` directory. I have also copied the ``css`` directory to the ``resources/static`` directory of the project.
+
+In file ``SeasonReport.html`` I modified the reference to the ``main.css`` file as follows: 
+```html
+<link rel="stylesheet" media="screen" th:href="@{/css/main.css}" />
+```
+
+#### Java source files
+Package ``config``: copied files MatchLoader.java and MatchResultDeserializer.java 
+- MatchLoader.java : Added Jackson dependency to pom.xml. Copied match/Match.java, match/MatchRepository.java and config/MatchResultDeserializer.java. Necessary to replace the javax.persistence imports with jakarta.persistence in the classes of the ``match`` package. Additionally, commented 
+```java
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
+```
+and added import of ``org.springframework.boot.CommandLineRunner`` . In the class, I modified the method signature to 
+```java
+public void run(String... args) throws Exception 
+```
+
+Package ``match`` :
+- Removed MatchResultDeserializer.java
+- MatchService.java : copied season/Season.java
+- MatchController.java 
+- MatchRepository.java : Added the @Repository annotation.
+
+Package ``liveproject.webreport``: 
+- WebreportApplication.java : Class with @SpringBootApplication annotation
+
